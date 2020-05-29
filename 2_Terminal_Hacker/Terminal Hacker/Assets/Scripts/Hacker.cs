@@ -1,10 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
     private string greeting = "I am Sauron.";
+    int level;  //  Game state
+    enum Screen { MainMenu, Password, Win };
+    Screen currentScreen = Screen.MainMenu;
+
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +28,7 @@ public class Hacker : MonoBehaviour
     /// </summary>
     void ShowMainMenu(string greeting)
     {
+        currentScreen = Screen.MainMenu;
         Terminal.ClearScreen();
         Terminal.WriteLine(greeting);
         Terminal.WriteLine("Where is the Green Lantern Ring?");
@@ -33,33 +39,50 @@ public class Hacker : MonoBehaviour
     }
     
     /// <summary>
-    /// Prints the the characters entered by the user on the terminal after hitting return.
+    /// The method will only handle the input, but will not run it.
     /// </summary>
     /// <param name="input">It will capture the characters ending with '\n'</param>
     void OnUserInput(string input)
-    {        
-        switch(input)
+    {
+        if (input == "menu")
+        {
+            ShowMainMenu(greeting);
+        }
+        else if (currentScreen == Screen.MainMenu)
+        {
+            RunMainMenu(input);
+        }        
+    }
+
+    private void RunMainMenu(string input)
+    {
+        switch (input)
         {
             case "1":
-                Terminal.WriteLine(input);
+                level = 1;
+                StartGame();
                 break;
 
             case "2":
-                Terminal.WriteLine(input);
+                level = 2;
+                StartGame();
                 break;
 
             case "3":
-                Terminal.WriteLine(input);
-                break;
-
-            case "menu":
-                ShowMainMenu(greeting);
-                break;
+                level = 3;
+                StartGame();
+                break;            
 
             default:
                 Terminal.WriteLine("If you don't know where to go, time to die!");
                 ShowMainMenu(greeting);
                 break;
         }
+    }
+
+    private void StartGame()
+    {        
+        currentScreen = Screen.Password;
+        Terminal.WriteLine("Please enter the password: ");
     }
 }
