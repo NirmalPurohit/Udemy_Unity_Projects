@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
     // Game configuration data
-    private string greeting = "I am Sauron.";
-    string[] level1Passwords = { "books", "aisle", "self", "password", "font", "borrow" };
+    const string menuHint = "You may type 'menu' at any time";
+    string greeting = "I am Sauron.";
+    string[] level1Passwords = { "books", "aisle", "shelf", "password", "font", "borrow" };
     string[] level2Passwords = { "cops", "criminal", "uniform", "witness", "interogation" };
-    string[] level3Passwords = { "space", "rocket", "atronaut", "fuel", "nasa", "orbit", "galaxy" };
+    string[] level3Passwords = { "space", "rocket", "astronaut", "fuel", "nasa", "orbit", "galaxy" };
 
     //  Game state
     private int level;
@@ -55,6 +55,11 @@ public class Hacker : MonoBehaviour
         {
             ShowMainMenu(greeting);
         }
+        else if (input == "quit" || input == "close")
+        {
+            Terminal.WriteLine("If on the web, close the tab.")
+            Application.Quit();
+        }
         else if (currentScreen == Screen.MainMenu)
         {
             RunMainMenu(input);
@@ -71,37 +76,43 @@ public class Hacker : MonoBehaviour
         if (isValidLevelNumber)
         {
             level = int.Parse(input);
-            StartGame();
+            AskForPassword();
         }
         else
         {
-            Terminal.WriteLine("If you don't know where to go, time to die!");            
+            Terminal.WriteLine("If you don't know where to go, time to die!");
+            Terminal.WriteLine("Or... " + menuHint);
         }       
     }
 
-    void StartGame()
-    {        
-        currentScreen = Screen.Password;        
+    void AskForPassword()
+    {
+        currentScreen = Screen.Password;
+        SetRandomPassword();
+        Terminal.ClearScreen();
+        Terminal.WriteLine("Enter the password, hint: " + password.Anagram());
+    }
+
+    void SetRandomPassword()
+    {
         switch (level)
         {
             case 1:
-                password = level1Passwords[3];  //  TODO: make random                
+                password = level1Passwords[UnityEngine.Random.Range(0, level1Passwords.Length)];
                 break;
 
             case 2:
-                password = level2Passwords[4];  //  TODO: make random                
+                password = level2Passwords[UnityEngine.Random.Range(0, level2Passwords.Length)];
                 break;
 
             case 3:
-                password = level3Passwords[1];  //  TODO: make random                
+                password = level3Passwords[UnityEngine.Random.Range(0, level3Passwords.Length)];
                 break;
 
             default:
-                Debug.LogError("Invalid level entered, somehow!");                
+                Debug.LogError("Invalid level entered, somehow!");
                 break;
         }
-        Terminal.ClearScreen();
-        Terminal.WriteLine("Please enter the password: ");
     }
 
     void CheckPassword(string input)
@@ -112,13 +123,60 @@ public class Hacker : MonoBehaviour
         }
         else
         {
-            Terminal.WriteLine("Oops, wrong password");
+            AskForPassword();
         }
     }
 
     void ShowWinScreen()
     {
         currentScreen = Screen.Win;
-        Terminal.WriteLine("You won!");
+        Terminal.ClearScreen();
+        ShowLevelReward();
+        Terminal.WriteLine(menuHint);
+    }
+
+    void ShowLevelReward()
+    {
+        switch (level)
+        {
+            case 1:
+                Terminal.WriteLine("Have a book...");
+                Terminal.WriteLine(@"
+    ________
+   /       //
+  /       //
+ /______ //                
+(_______(/
+                ");
+                break;
+
+            case 2:
+                Terminal.WriteLine("This is the evidence...");
+                Terminal.WriteLine(@"
+   _____
+ _/ 008 \________
+ |              |---
+ |              | /
+ |______________|/
+                ");
+                break;
+
+            case 3:
+                Terminal.WriteLine("Loading the rocket blueprint.....");
+                Terminal.WriteLine(@"
+   / \
+ _/ N \_
+/_| A |_\ 
+ _| S |_
+/ | A | \
+| |___| |
+|/-----\|
+                ");
+                break;
+
+            default:
+                Debug.LogError("Invalid level reached, somehow!");
+                break;
+        }
     }
 }
