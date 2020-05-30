@@ -5,10 +5,17 @@ using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
+    // Game configuration data
     private string greeting = "I am Sauron.";
-    int level;  //  Game state
-    enum Screen { MainMenu, Password, Win };
-    Screen currentScreen = Screen.MainMenu;
+    string[] level1Passwords = { "books", "aisle", "self", "password", "font", "borrow" };
+    string[] level2Passwords = { "cops", "criminal", "uniform", "witness", "interogation" };
+    string[] level3Passwords = { "space", "rocket", "atronaut", "fuel", "nasa", "orbit", "galaxy" };
+
+    //  Game state
+    private int level;
+    private enum Screen { MainMenu, Password, Win };
+    private Screen currentScreen;
+    private string password;
 
 
     // Start is called before the first frame update
@@ -51,38 +58,67 @@ public class Hacker : MonoBehaviour
         else if (currentScreen == Screen.MainMenu)
         {
             RunMainMenu(input);
-        }        
+        }
+        else if (currentScreen == Screen.Password)
+        {
+            CheckPassword(input);
+        }
+    }      
+
+    void RunMainMenu(string input)
+    {
+        bool isValidLevelNumber = (input == "1" || input == "2" || input == "3");
+        if (isValidLevelNumber)
+        {
+            level = int.Parse(input);
+            StartGame();
+        }
+        else
+        {
+            Terminal.WriteLine("If you don't know where to go, time to die!");            
+        }       
     }
 
-    private void RunMainMenu(string input)
-    {
-        switch (input)
+    void StartGame()
+    {        
+        currentScreen = Screen.Password;        
+        switch (level)
         {
-            case "1":
-                level = 1;
-                StartGame();
+            case 1:
+                password = level1Passwords[3];  //  TODO: make random                
                 break;
 
-            case "2":
-                level = 2;
-                StartGame();
+            case 2:
+                password = level2Passwords[4];  //  TODO: make random                
                 break;
 
-            case "3":
-                level = 3;
-                StartGame();
-                break;            
+            case 3:
+                password = level3Passwords[1];  //  TODO: make random                
+                break;
 
             default:
-                Terminal.WriteLine("If you don't know where to go, time to die!");
-                ShowMainMenu(greeting);
+                Debug.LogError("Invalid level entered, somehow!");                
                 break;
+        }
+        Terminal.ClearScreen();
+        Terminal.WriteLine("Please enter the password: ");
+    }
+
+    void CheckPassword(string input)
+    {
+        if (input == password)
+        {
+            ShowWinScreen();
+        }
+        else
+        {
+            Terminal.WriteLine("Oops, wrong password");
         }
     }
 
-    private void StartGame()
-    {        
-        currentScreen = Screen.Password;
-        Terminal.WriteLine("Please enter the password: ");
+    void ShowWinScreen()
+    {
+        currentScreen = Screen.Win;
+        Terminal.WriteLine("You won!");
     }
 }
